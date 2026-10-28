@@ -1,0 +1,9 @@
+plugins { id 'com.android.application' }
+android {
+ namespace 'fr.zachiran.robot'
+ compileSdk 35
+ defaultConfig { applicationId 'fr.zachiran.robot'; minSdk 24; targetSdk 35; versionCode 1; versionName '1.0.0' }
+ sourceSets { main { assets.srcDirs = [rootProject.file('docs')]; assets.exclude 'downloads/**', 'screenshots/**', '.nojekyll' } }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+ buildTypes { release { minifyEnabled false } }
+}
