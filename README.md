@@ -1,24 +1,26 @@
 # Dernier Robot
 
-Tu es la dernière machine encore debout. Déplace-toi dans l’arène, laisse tes armes tirer et choisis tes améliorations pour survivre à l’assaut.
+Traverse cinq secteurs, affronte les gardiens et construis ton robot à chaque montée de niveau. Ramasse des bonus, esquive les salves et choisis entre puissance et réparation.
 
 **Android 7.0+ avec Android System WebView à jour · 100 % hors ligne dans l’APK · Sans compte · Sans publicité · MIT**
 
 - [Jouer sur la page du jeu](https://zachiran42.github.io/dernier-robot/)
-- [Télécharger l’APK signé de test](docs/downloads/dernier-robot-1.0.0.apk)
+- [Télécharger l’APK signé de test](docs/downloads/dernier-robot-1.1.0.apk)
 - [Signaler un problème](https://github.com/Zachiran42/dernier-robot/issues)
 
 ## Jouer
 
-1. Maintiens et glisse le doigt pour déplacer ton robot.
-2. Les tirs sont automatiques. Ramasse les fragments bleus.
-3. Choisis tes améliorations et survis pendant 90 secondes.
+1. Glisse pour bouger. Les tirs sont automatiques ; utilise Esquive pour traverser le danger.
+2. Ramasse l’expérience et choisis une augment à chaque montée de niveau.
+3. Après un secteur, choisis ta route : puissance et risque, réparation ou bonus temporaires.
 
-Sur ordinateur : flèches, WASD ou ZQSD. Échap met le jeu en pause. Une partie en cours et la progression sont conservées localement. Les données de la démo web et celles de l’APK sont indépendantes.
+TÉLÉPHONE · Joystick au doigt + Esquive · CLAVIER · Flèches / ZQSD · ESPACE esquive · CHOIX · 1 / 2 / 3 · ÉCHAP pause
+
+La progression reste stockée localement. Les règles de la version1.1 changent : les anciennes parties en cours redémarrent, les déblocages et améliorations permanentes sont conservés.
 
 ## Installer sur Android
 
-Télécharger l’APK depuis ce dépôt ou sa page. Ouvrir le fichier sur Android et autoriser l’installation pour l’application utilisée pour le téléchargement si Android le demande. L’APK 1.0.0 est une version de test signée avec une clé de développement. Une signature de production stable est recommandée avant une distribution durable.
+Télécharger l’APK depuis ce dépôt ou sa page. Ouvrir le fichier sur Android et autoriser l’installation pour l’application utilisée pour le téléchargement si Android le demande. L’APK 1.1.0 est une version de test signée avec une clé de développement. Une signature de production stable est recommandée avant une distribution durable.
 
 ## Développer et compiler
 
@@ -48,6 +50,10 @@ Aucune permission INTERNET dans le manifeste Android. Pas de télémétrie ni d�
 
 Le code, les graphismes procéduraux et les textes originaux sont sous [licence MIT](LICENSE). Le wrapper Gradle et les outils de compilation tiers conservent leurs propres licences.
 
-## Version 1.0.0
+## Version 1.1.0
 
-Première version jouable. Le comportement tactile et les performances peuvent varier selon le WebView Android de l’appareil.
+Version enrichie avec commandes et difficulté revues. Le comportement tactile et les performances peuvent varier selon le WebView Android de l’appareil.
+
+## Nouveautés 1.1.0
+
+La survie de 90 secondes devient une tentative sur cinq secteurs avec un gardien au troisième et un boss final. Ajout des tireurs et chargeurs, de l’esquive à recharge, de dix augments combinables et de cinq bonus ramassables. Entre les secteurs : augment contre ennemis renforcés, soin sans gain de puissance, ou bouclier/aimant contre davantage de coureurs.
