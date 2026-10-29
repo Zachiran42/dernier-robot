@@ -17,6 +17,8 @@
     saved: isRecord(stored.saved) ? copy(stored.saved) : null,
     best: Number.isFinite(Number(stored.best)) ? Math.max(0, Number(stored.best)) : 0
   };
+  const incompatibleSave = !!(state.saved && config.saveVersion && state.saved.version !== config.saveVersion);
+  if (incompatibleSave) state.saved = null;
   let game = null;
   let preview = null;
   let paused = true;
@@ -29,6 +31,8 @@
   let hudText = '';
   let pointerId = null;
   const heldKeys = new Set();
+  const inputButtons = [];
+  function syncControls() { for (const button of inputButtons) button.disabled = paused || !started || ended; }
 
   function store() {
     // The home preview must never replace a saved game or normalize its progress.
@@ -62,6 +66,7 @@
     element('play').textContent = button;
     element('overlay').dataset.mode = mode;
     element('overlay').hidden = false;
+    syncControls();
     element('restart').hidden = mode === 'home' && !state.saved;
     element('record').textContent = state.best ? 'Meilleur score · ' + state.best : 'Hors ligne · Sans compte · Sans publicité';
     element('play').focus({ preventScroll: true });
@@ -130,6 +135,7 @@
     pointerId = null;
     saveClock = 0;
     element('overlay').hidden = true;
+    syncControls();
     last = performance.now();
     store();
     canvas.focus({ preventScroll: true });
@@ -147,6 +153,7 @@
     paused = false;
     saveClock = 0;
     element('overlay').hidden = true;
+    syncControls();
     last = performance.now();
     canvas.focus({ preventScroll: true });
   }
@@ -166,6 +173,31 @@
   };
   element('restart').onclick = () => start(true);
   element('pause').onclick = pause;
+
+  function pulseControl(key) {
+    if (!started || paused || ended) return;
+    game.key(key, true);
+    game.key(key, false);
+    store();
+    syncControls();
+    canvas.focus({ preventScroll: true });
+  }
+  if (config.controls === 'directional') {
+    element('directions').hidden = false;
+    for (const [id, key] of [['dir-left','ArrowLeft'], ['dir-up','ArrowUp'], ['dir-down','ArrowDown'], ['dir-right','ArrowRight']]) {
+      const button = element(id);
+      inputButtons.push(button);
+      button.onclick = () => pulseControl(key);
+    }
+  }
+  if (config.action) {
+    element('action-row').hidden = false;
+    const button = element('action');
+    button.textContent = config.action.label;
+    inputButtons.push(button);
+    button.onclick = () => pulseControl(config.action.key);
+  }
+
 
   function position(event) {
     const bounds = canvas.getBoundingClientRect();
@@ -233,6 +265,6 @@
     return result;
   }
   try { preview = makePreview(state.progress); } catch { preview = makePreview({}); }
-  show(config.title, config.description, state.saved ? 'Reprendre ma partie' : 'Jouer', 'home');
+  show(config.title, config.description + (incompatibleSave ? ' Ta progression est conservée ; la partie en cours redémarre avec les nouvelles règles.' : ''), state.saved ? 'Reprendre ma partie' : 'Jouer', 'home');
   requestAnimationFrame(frame);
 })();
