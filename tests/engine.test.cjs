@@ -28,7 +28,7 @@ function harness(options = {}) {
       releasePointerCapture(id) { this.capture.delete(id); this.emit('lostpointercapture', { pointerId: id }); }
     };
   }
-  const elements = Object.fromEntries(['game', 'hint', 'hud', 'overlay', 'overlay-title', 'overlay-text', 'play', 'restart', 'record', 'pause'].map(id => [id, node()]));
+  const elements = Object.fromEntries(['game', 'hint', 'hud', 'overlay', 'overlay-title', 'overlay-text', 'play', 'restart', 'record', 'pause', 'directions', 'dir-left', 'dir-up', 'dir-down', 'dir-right', 'action-row', 'action'].map(id => [id, node()]));
   elements.hud.children = Array.from({length: 3}, () => ({children: [node(), node()]}));
   const classes = new Set();
   const document = {
@@ -37,7 +37,7 @@ function harness(options = {}) {
     addEventListener(name, callback) { domListeners.set(name, callback); }
   };
   const window = {
-    APP: { slug, title: 'Test game', description: 'Test description' },
+    APP: { slug, title: 'Test game', description: 'Test description', controls: options.controls, action: options.action, saveVersion: options.saveVersion },
     addEventListener(name, callback) { if (!listeners.has(name)) listeners.set(name, []); listeners.get(name).push(callback); },
     createGame(api) {
       const instance = {
@@ -197,4 +197,28 @@ test('visibility and pagehide both save and pause the active game', () => {
 test('terminal snapshot left by interrupted end callback starts a playable run', () => {
   const h = harness({state: {progress: {coins: 22}, saved: {value: 40, status: 'won'}}}); h.click('play');
   assert.equal(h.current().value, 0); assert.equal(h.current().resets, 1); assert.equal(h.saved().progress.coins, 22);
+});
+
+test('direction buttons produce exactly one step and release the key', () => {
+ const h=harness({controls:'directional'});h.click('dir-left');assert.equal(h.current().keys.length,0);
+ h.click('play');const game=h.current();
+ for(const [id,key]of [['dir-left','ArrowLeft'],['dir-up','ArrowUp'],['dir-down','ArrowDown'],['dir-right','ArrowRight']]){const n=game.keys.length;h.click(id);assert.deepEqual(game.keys.slice(n),[[key,true],[key,false]]);}
+ assert.equal(game.held.size,0);assert.equal(h.elements['dir-left'].disabled,false);
+});
+test('direction buttons cannot move during pause, menus or terminal results', () => {
+ const h=harness({controls:'directional'});h.click('play');h.click('pause');const game=h.current(),n=game.keys.length;
+ assert.equal(h.elements['dir-up'].disabled,true);h.click('dir-up');assert.equal(game.keys.length,n);
+ h.click('play');assert.equal(h.elements['dir-up'].disabled,false);h.window.arcade.api.end('Lost','',0,false);const ended=game.keys.length;h.click('dir-up');assert.equal(game.keys.length,ended);
+});
+test('action button can pulse a dash while the joystick pointer stays captured', () => {
+ const h=harness({action:{key:' ',label:'Esquive'}});h.click('play');h.pointer('pointerdown',7);const game=h.current(),n=game.keys.length;
+ h.click('action');assert.deepEqual(game.keys.slice(n),[[' ',true],[' ',false]]);assert(h.elements.game.capture.has(7));assert.equal(game.held.size,0);
+ h.click('pause');assert.equal(h.elements.action.disabled,true);const paused=game.keys.length;h.click('action');assert.equal(game.keys.length,paused);
+});
+
+
+test('new rules discard only an incompatible active run and preserve permanent progression', () => {
+ const h=harness({saveVersion:2,state:{progress:{coins:55,level:4},saved:{version:1,value:99},best:80}});
+ assert.equal(h.elements.play.textContent,'Jouer');assert.equal(h.writes.length,0);assert.match(h.elements['overlay-text'].textContent,/progression est conservée/);
+ h.click('play');assert.equal(h.current().value,0);assert.equal(h.saved().progress.coins,55);assert.equal(h.saved().progress.level,4);assert.equal(h.saved().best,80);
 });
