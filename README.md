@@ -57,3 +57,21 @@ Version enrichie avec commandes et difficulté revues. Le comportement tactile e
 ## Nouveautés 1.1.0
 
 La survie de 90 secondes devient une tentative sur cinq secteurs avec un gardien au troisième et un boss final. Ajout des tireurs et chargeurs, de l’esquive à recharge, de dix augments combinables et de cinq bonus ramassables. Entre les secteurs : augment contre ennemis renforcés, soin sans gain de puissance, ou bouclier/aimant contre davantage de coureurs.
+
+## Publication des mises à jour pour Cercle
+
+Le workflow `.github/workflows/release-apk.yml` publie automatiquement l’APK déjà compilé et signé lors d’un push sur `main`. Il utilise le jeton temporaire GitHub du dépôt ; aucune clé de signature n’est envoyée à GitHub Actions.
+
+1. Augmenter `versionName` et `versionCode` dans `app/build.gradle`.
+
+2. Compiler l’APK avec la même clé de signature que les versions distribuées.
+
+3. Ajouter `docs/downloads/dernier-robot-<versionName>.apk` et son fichier `.apk.sha256`.
+
+4. Pousser l’APK, son empreinte et la configuration de version sur `main`.
+
+Le script `tools/publish-apk.py` contrôle la signature, le paquet, la version et le SHA-256 avant de créer une Release contenant l’APK, son empreinte et la licence MIT. Une version publiée est conservée sans remplacement. Un push du code seul ne produit pas un APK de distribution.
+
+Cercle recherche les nouvelles Releases au démarrage, à la demande et lors de sa vérification périodique. Les utilisateurs confirment ensuite le téléchargement et l’installation Android.
+
+Première exécution validée : https://github.com/Zachiran42/dernier-robot/actions/runs/41019334713
