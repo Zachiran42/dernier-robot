@@ -1,0 +1,29 @@
+name: Publier l'APK pour Cercle
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/downloads/**'
+      - 'app/build.gradle'
+      - 'tools/publish-apk.py'
+      - 'tools/release-apk.json'
+      - '.github/workflows/release-apk.yml'
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: release-apk
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Vérifier et publier l'APK versionné
+        run: python3 tools/publish-apk.py
+        env:
+          GH_TOKEN: ${{ github.token }}
